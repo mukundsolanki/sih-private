@@ -1,3 +1,4 @@
+
 /**
  * Socket.io socket
  */
@@ -12,38 +13,38 @@ let localStream = null;
 let peers = {}
 
 // redirect if not https
-if(location.href.substr(0,5) !== 'https') 
+if (location.href.substr(0, 5) !== 'https')
     location.href = 'https' + location.href.substr(4, location.href.length - 4)
 
 
 //////////// CONFIGURATION //////////////////
 
 /**
- * RTCPeerConnection configuration 
+ * RTCPeerConnection configuration
  */
 
 const configuration = {
     // Using From https://www.metered.ca/tools/openrelay/
     "iceServers": [
-    {
-      urls: "stun:openrelay.metered.ca:80"
-    },
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443?transport=tcp",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    }
-  ]
+        {
+            urls: "stun:openrelay.metered.ca:80"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        }
+    ]
 }
 
 /**
@@ -63,15 +64,15 @@ let constraints = {
 
 /////////////////////////////////////////////////////////
 
-constraints.video.facingMode = {
-    ideal: "user"
-}
+// constraints.video.facingMode = {
+//     ideal: "user"
+// }
 
 // enabling the camera at startup
 navigator.mediaDevices.getUserMedia(constraints).then(stream => {
     console.log('Received local stream');
 
-    localVideo.srcObject = stream;
+    // **Remove this line**: localVideo.srcObject = stream;
     localStream = stream;
 
     init()
@@ -114,9 +115,9 @@ function init() {
 }
 
 /**
- * Remove a peer with given socket_id. 
+ * Remove a peer with given socket_id.
  * Removes the video element and deletes the connection
- * @param {String} socket_id 
+ * @param {String} socket_id
  */
 function removePeer(socket_id) {
 
@@ -138,11 +139,11 @@ function removePeer(socket_id) {
 
 /**
  * Creates a new peer connection and sets the event listeners
- * @param {String} socket_id 
- *                 ID of the peer
- * @param {Boolean} am_initiator 
- *                  Set to true if the peer initiates the connection process.
- *                  Set to false if the peer receives the connection. 
+ * @param {String} socket_id
+ *                 ID of the peer
+ * @param {Boolean} am_initiator
+ *                  Set to true if the peer initiates the connection process.
+ *                  Set to false if the peer receives the connection.
  */
 function addPeer(socket_id, am_initiator) {
     peers[socket_id] = new SimplePeer({
@@ -196,7 +197,7 @@ function switchMedia() {
         track.stop()
     })
 
-    localVideo.srcObject = null
+    // **Remove this line**: localVideo.srcObject = null
     navigator.mediaDevices.getUserMedia(constraints).then(stream => {
 
         for (let socket_id in peers) {
@@ -211,7 +212,7 @@ function switchMedia() {
         }
 
         localStream = stream
-        localVideo.srcObject = stream
+        // **Remove this line**: localVideo.srcObject = stream
 
         updateButtons()
     })
@@ -235,7 +236,7 @@ function setScreen() {
         }
         localStream = stream
 
-        localVideo.srcObject = localStream
+        // **Remove this line**: localVideo.srcObject = localStream
         socket.emit('removeUpdatePeer', '')
     })
     updateButtons()
@@ -252,7 +253,7 @@ function removeLocalStream() {
             track.stop()
         })
 
-        localVideo.srcObject = null
+        // **Remove this line**: localVideo.srcObject = null
     }
 
     for (let socket_id in peers) {
@@ -290,3 +291,4 @@ function updateButtons() {
         muteButton.innerText = localStream.getAudioTracks()[index].enabled ? "Unmuted" : "Muted"
     }
 }
+
