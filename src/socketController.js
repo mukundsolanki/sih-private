@@ -12,8 +12,8 @@ module.exports = (io) => {
         peers[socket.id] = socket
 
         // Asking all other clients to setup the peer connection receiver
-        for(let id in peers) {
-            if(id === socket.id) continue
+        for (let id in peers) {
+            if (id === socket.id) continue
             console.log('sending init receive to ' + socket.id)
             peers[id].emit('initReceive', socket.id)
         }
@@ -23,10 +23,22 @@ module.exports = (io) => {
          */
         socket.on('signal', data => {
             console.log('sending signal from ' + socket.id + ' to ', data)
-            if(!peers[data.socket_id])return
+            if (!peers[data.socket_id]) return
             peers[data.socket_id].emit('signal', {
                 socket_id: socket.id,
                 signal: data.signal
+            })
+        })
+
+
+        socket.on('chat-message', data => {
+            console.log('Chat message from ' + data.sender, data)
+
+            // Send to specific recipients
+            data.recipients.forEach(recipientId => {
+                if (peers[recipientId] && recipientId !== data.sender) {
+                    peers[recipientId].emit('chat-message', data)
+                }
             })
         })
 

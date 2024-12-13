@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speech to Text (Hindi)</title>
+    <style>
+      #transcription {
+        width: 100%;
+        height: 200px;
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:disabled {
+        background-color: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Speech to Text (Hindi)</h1>
+    <button id="toggleButton">Start Listening</button>
+    <div id="transcription"></div>
+
+    <script>
+      let isListening = false;
+      const toggleButton = document.getElementById("toggleButton");
+      const transcriptionDiv = document.getElementById("transcription");
+      let recognition;
+
+      // Function to start and stop the speech recognition
+      function toggleListening() {
+        if (isListening) {
+          recognition.stop();
+          toggleButton.textContent = "Start Listening";
+        } else {
+          startListening();
+          toggleButton.textContent = "Stop Listening";
+        }
+        isListening = !isListening;
+      }
+
+      // Function to start speech recognition
+      function startListening() {
+        if ("webkitSpeechRecognition" in window) {
+          recognition = new webkitSpeechRecognition();
+          recognition.continuous = true; // Keep listening continuously
+          recognition.interimResults = true; // Show real-time updates
+          recognition.lang = "hi-IN"; // Set language to Hindi
+
+          recognition.onresult = function (event) {
+            let finalTranscript = "";
+            let interimTranscript = "";
+
+            // Iterate over results
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const result = event.results[i];
+              if (result.isFinal) {
+                finalTranscript += result[0].transcript; // Append final result
+              } else {
+                interimTranscript += result[0].transcript; // Interim result (optional)
+              }
+            }
+
+            // Append final transcript to the transcription area
+            transcriptionDiv.textContent = finalTranscript;
+
+            // If you want to see interim results, you can do:
+            // transcriptionDiv.textContent = finalTranscript + interimTranscript;
+          };
+
+          recognition.onend = function () {
+            if (isListening) {
+              recognition.start();
+            }
+          };
+
+          recognition.onerror = function (event) {
+            console.error("Speech recognition error", event);
+            recognition.stop();
+            toggleButton.textContent = "Start Listening";
+            isListening = false;
+          };
+
+          recognition.start();
+        } else {
+          alert("Speech recognition not supported in this browser.");
+        }
+      }
+
+      // Add event listener to the toggle button
+      toggleButton.addEventListener("click", toggleListening);
+    </script>
+  </body>
+</html>

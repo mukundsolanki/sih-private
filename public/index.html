@@ -27,6 +27,26 @@
       .vid {
         flex: 0 1 auto;
         height: 400px;
+        position: relative; /* To position the select box */
+      }
+
+      .settings.red {
+        color: red; /* Text color red when disabled */
+      }
+
+      .vid-container {
+        position: relative;
+      }
+
+      .select-box {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
       }
 
       .button-container {
@@ -59,25 +79,131 @@
       #videos {
         margin-bottom: 20px;
       }
+      #localVideo {
+        position: fixed; /* Position fixed to the viewport */
+        bottom: 20px; /* 10px from the bottom */
+        right: 20px; /* 10px from the right */
+        width: 250x; /* Adjust width as needed */
+        height: auto; /* Maintain aspect ratio */
+      }
+      .icon-button {
+        background: none;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 15px;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .icon-button img {
+        width: 20px; /* Adjust icon size as needed */
+        height: auto;
+        filter: invert(1); /* Invert the icon color to white */
+      }
+
+      .icon-button.red img {
+        filter: invert(0) hue-rotate(180deg) saturate(10); /* Red color */
+      }
+
+      .input-group.centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .text-input.rounded {
+        border-radius: 5px;
+        padding: 5px;
+        margin-right: 5px;
+      }
+      .user-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .user-checkbox {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px;
+        border-radius: 5px;
+      }
+
+      .settings.frosted {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 5px;
+        backdrop-filter: blur(10px);
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .settings.frosted:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
     </style>
   </head>
 
   <body>
-    <div id="videos" class="container">
-      <video id="localVideo" class="vid" autoplay muted></video>
-    </div>
+    <div id="videos" class="container"></div>
 
     <div class="button-container">
-      <button id="muteButton" class="settings" onclick="toggleMute()">
-        Unmuted
-      </button>
-      <button id="vidButton" class="settings" onclick="toggleVid()">
-        Video Enabled
+      <div>
+        <button id="muteButton" class="settings" onclick="toggleMute()">
+          Mute
+        </button>
+        <button id="vidButton" class="settings" onclick="toggleVid()">
+          Video
+        </button>
+      </div>
+
+      <div class="input-group centered">
+        <input
+          type="text"
+          id="newTextInput"
+          class="text-input rounded"
+          placeholder="Enter new text here"
+        />
+        <button
+          id="newTextButton"
+          class="settings frosted"
+          onclick="handleNewTextInput()"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+    <video id="localVideo" class="vid" autoplay muted></video>
+    <div id="chat-container">
+      <div id="user-list" class="user-list"></div>
+      <div id="chat-messages"></div>
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Type your message..."
+      />
+      <button id="send-message" class="settings" onclick="sendMessage()">
+        Send
       </button>
     </div>
-  </body>
 
-  <footer>
-    <script src="/js/main.js" lang="text/javascript"></script>
-  </footer>
+    <footer>
+      <script src="/js/main.js" lang="text/javascript"></script>
+      <script>
+        // Add this inline script to ensure sendMessage is defined before use
+        function sendMessageHandler() {
+          // This will call the sendMessage function from main.js
+          if (typeof sendMessage === "function") {
+            sendMessage();
+          } else {
+            console.error("sendMessage function is not defined");
+          }
+        }
+      </script>
+    </footer>
+  </body>
 </html>
