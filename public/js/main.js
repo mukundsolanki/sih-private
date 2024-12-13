@@ -458,6 +458,49 @@ function sendMessage() {
 window.sendMessage = sendMessage;
 
 
+function sendCaption() {
+    // Ensure socket is initialized
+    if (!socket) {
+        console.error('Socket not initialized');
+        return;
+    }
+
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+
+    if (!message) return;
+
+    const selectedPeers = Array.from(document.querySelectorAll('.user-checkbox input:checked'))
+        .map(checkbox => checkbox.value);
+
+    if (selectedPeers.length === 0) {
+        alert('Please select at least one peer to send the message to.');
+        return;
+    }
+    const messageData = {
+        message: message,
+        sender: socket.id,
+        recipients: selectedPeers
+    };
+
+    // Emit to server to broadcast to selected peers
+    socket.emit('chat-message', messageData);
+
+    // Display message locally for the sender
+    displayCaption({
+        message: message,
+        sender: 'You',
+        isLocal: true
+    });
+
+    messageInput.value = '';
+}
+
+// Make sure sendMessage is globally accessible
+window.sendCaption = sendCaption;
+
+
+
 function speakMessage(message) {
     // Ensure we have a message to speak
     if (!message) {
@@ -521,6 +564,28 @@ function displayMessage(data) {
         }, 100);
     }
 }
+
+
+function displayCaption(data) {
+    const chatMessages = document.getElementById('caption-messages');
+    const messageEl = document.createElement('div');
+
+    messageEl.innerHTML = `<strong>${data.sender}:</strong> ${data.message}`;
+    messageEl.style.color = 'white';
+
+    chatMessages.appendChild(messageEl);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Only speak non-local messages
+    // if (!data.isLocal) {
+    //     // Slight delay to ensure DOM is updated
+    //     setTimeout(() => {
+    //         speakMessage(data.message);
+    //     }, 100);
+    // }
+}
+
+
 function logAvailableVoices() {
     if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices();
@@ -593,13 +658,22 @@ function init() {
     })
 
     socket.on('chat-message', data => {
-        // Only display the message if the current user is a recipient
-        displayMessage({
-            message: data.message,
-            sender: `Peer ${data.sender.substring(0, 5)}`,
-            isBroadcast: true
-        });
-    })
+        if (data.type === 'caption') {
+            displayCaption({
+                text: data.message,
+                sender: `Peer ${data.sender.substring(0, 5)}`,
+                isLocal: false
+            });
+        } else {
+            // Handle regular chat messages as before
+            displayMessage({
+                message: data.message,
+                sender: `Peer ${data.sender.substring(0, 5)}`,
+                isLocal: false
+            });
+        }
+    });
+    
 }
 
 /**
