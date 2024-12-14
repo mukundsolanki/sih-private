@@ -3,272 +3,33 @@
   <head>
     <script lang="text/javascript" src="/socket.io/socket.io.js"></script>
     <script src="/simple-peer/simplepeer.min.js"></script>
-    <style>
-      body {
-        background-color: rgb(255, 255, 255);
-        font-family: Arial, sans-serif;
-        color: white;
-        margin: 0;
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      .main-container {
-        display: flex;
-        height: 100vh;
-      }
-
-      /* Left sidebar for chat */
-      .chat-sidebar {
-        width: 300px;
-        background: rgba(56, 56, 56, 0.8);
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .user-list {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 10px;
-        border-radius: 8px;
-        max-height: 150px;
-        overflow-y: auto;
-      }
-
-      .chat-messages {
-        flex-grow: 1;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
-        padding: 10px;
-        overflow-y: auto;
-        margin: 10px 0;
-      }
-
-      .chat-input {
-        display: flex;
-        gap: 10px;
-        padding: 10px;
-      }
-
-      /* Main content area */
-      /* Adjust the content area to maximize space */
-      .content-area {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        padding: 0; /* Remove any padding */
-      }
-
-      /* Main video container */
-      .video-container {
-        flex-grow: 1;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px; /* Minimal gap */
-        justify-content: center;
-        align-items: center;
-        padding: 5px; /* Minimal padding */
-        overflow-y: auto;
-      }
-
-      .remote-video {
-        width: 95%; /* Almost full width */
-        min-width: 1200px; /* Much larger minimum width */
-        min-height: 800px; /* Much larger minimum height */
-        max-height: 90vh; /* 90% of viewport height */
-        border-radius: 10px;
-        background: rgba(56, 56, 56, 0.8);
-        object-fit: cover;
-      }
-
-      /* Local video (bottom right) */
-      #localVideo {
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        width: 250px;
-        height: 180px;
-        border-radius: 10px;
-        z-index: 100;
-        background: rgba(0, 0, 0, 0.5);
-      }
-
-      /* Controls bar */
-      .controls-bar {
-        padding: 15px;
-        background: rgba(56, 56, 56, 0.8);
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      /* Transcription box */
-      #transcription-box {
-        position: fixed;
-        bottom: 80px;
-        left: 340px;
-        right: 300px;
-        height: 80px;
-        max-height: 300px;
-        background: rgba(0, 0, 0, 0.7);
-        border-radius: 8px;
-        padding: 15px;
-        z-index: 90;
-        overflow-y: auto;
-      }
-
-      .transcription-text {
-        height: 100%;
-        color: white;
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      /* Enhanced button styles */
-      .settings {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .settings:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-
-      .settings:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .sendButton {
-        background: #bcdcff;
-        color: white;
-        border-radius: 20px;
-        padding: 10px 20px;
-        cursor: pointer;
-      }
-
-      /* Input styles */
-      input[type="text"] {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        padding: 8px 15px;
-        color: white;
-        flex-grow: 1;
-      }
-
-      input[type="text"]::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-      }
-
-      select.settings {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 8px 15px;
-      }
-
-      /* Scrollbar styling */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-      }
-
-      .hang-button {
-        background-color: #d32f2f;
-        border: none;
-        cursor: pointer;
-      }
-
-      .hang-button img {
-        vertical-align: middle;
-      }
-
-      .hang-button:hover {
-        background-color: #b71c1c;
-      }
-
-      #caption-head {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-
-      /* Container for all videos */
-      /* #videos {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center; 
-        gap: 15px;
-        padding: 15px;
-      } */
-
-      
-      /* .vid-container {
-        flex: 1 1 calc(33.33% - 30px);
-        max-width: calc(33.33% - 30px);
-        box-sizing: border-box;
-        text-align: center;
-      } */
-
-      /* Video element */
-      /* .vid {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-      } */
-
-      /* Socket ID text */
-      .socket-id-text {
-        color: black;
-        font-size: 16px;
-        margin-top: 8px;
-      }
-
-      .chat-sidebar h2 {
-        text-align: center; /* Ensures the text is centered within the h2 element */
-        width: 100%; /* Takes full width of the parent container */
-        margin-top: 0;
-        margin-bottom: 0;
-      }
-
-
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="main-container">
       <!-- Left Chat Sidebar -->
       <div class="chat-sidebar">
-        <h2>VYANJAK</h2>
+        <div class="sidebar-header">
+          <h2>VYANJAK</h2>
+          <button class="collapse-btn" onclick="toggleSidebar()">
+            <img
+              src="assets/sidebar_close.svg"
+              alt="Collapse"
+              width="20"
+              height="20"
+              id="collapse-icon"
+            />
+          </button>
+        </div>
 
-        
         <div class="user-list">
-
           <div>
-            <p style="margin-bottom: 3; margin-top: 0; text-align: center;">Select peers to chat</p>
+            <p style="margin-bottom: 3; margin-top: 0; text-align: center; font-size: 30px;">
+              Select peers to chat
+            </p>
           </div>
           <!-- User checkboxes will be populated here -->
-           <div id="user-list">
-
-           </div>
-           
+          <div id="user-list" style="font-size: 30px;"></div>
         </div>
         <div class="chat-messages" id="chat-messages">
           <!-- Chat messages will appear here -->
@@ -279,7 +40,7 @@
             id="message-input"
             placeholder="Type your message..."
           />
-          <button class="settings sendButton" onclick="sendMessage()">
+          <button class=" sendButton" onclick="sendMessage()">
             <img
               id="sendIcon"
               src="assets/send.svg"
@@ -352,11 +113,21 @@
     <footer>
       <script src="/js/main.js" lang="text/javascript"></script>
       <script>
+        function toggleSidebar() {
+          const sidebar = document.querySelector(".chat-sidebar");
+          sidebar.classList.toggle("collapsed");
+
+          if (sidebar.classList.contains("collapsed")) {
+            sidebar.style.backgroundColor = "transparent"; 
+          } else {
+            sidebar.style.backgroundColor = "";
+          }
+        }
+
         function closeWindow() {
           window.close();
         }
 
-        // Add this inline script to ensure sendMessage is defined before use
         function sendMessageHandler() {
           // This will call the sendMessage function from main.js
           if (typeof sendMessage === "function") {
@@ -436,22 +207,6 @@
               );
             };
 
-            // websocket.onmessage = (event) => {
-            //   const data = JSON.parse(event.data);
-            //   if (data.type === "final") {
-            //     // Set the transcribed text to the message input field
-            //     const messageInput = document.getElementById("message-input");
-            //     messageInput.value = data.text;
-
-            //     // Call the sendMessage function to send the transcribed message
-            //     if (typeof sendCaption === "function") {
-            //       sendCaption();
-            //     } else {
-            //       console.error("sendMessage function is not defined");
-            //     }
-            //   }
-            // };
-
             websocket.onmessage = (event) => {
               const data = JSON.parse(event.data);
               if (data.type === "final") {
@@ -474,7 +229,7 @@
 
             // Initialize audio context and worklet
             audioContext = new AudioContext({
-              sampleRate: 16000, // Match Vosk's expected sample rate
+              sampleRate: 8000, // Match Vosk's expected sample rate
               latencyHint: "interactive",
             });
 
