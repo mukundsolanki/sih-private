@@ -1,4 +1,4 @@
-// Sample onlineList data
+// Sample onlineList data (you might be fetching this dynamically in a real application)
 const onlineList = [
     { name: "Intercom 1", ip: "192.168.8.67" },
     { name: "Intercom 2", ip: "192.168.1.2" },
@@ -21,39 +21,41 @@ const rejectButton = document.getElementById('rejectButton');
 // Establish Socket.io connection
 const socket = io('http://localhost:3000'); // Ensure this matches your backend URL
 
-// Listen for 'callSingle' event from the server
-socket.on('callSingle', (ip) => {
-    console.log(`Received callSingle event for IP: ${ip}`);
-    showCallModal(ip);
+// Upon connection, register the device with its IP
+socket.on('connect', () => {
+    console.log('Connected to server with socket ID:', socket.id);
+    // Assuming each device knows its own IP; replace 'YOUR_DEVICE_IP' with actual IP
+    const deviceIp = getDeviceIp(); // Implement this function based on your environment
+    socket.emit('register', { ip: deviceIp });
 });
 
-// Listen for 'callMultiple' event from the server
-socket.on('callMultiple', (ips) => {
-    console.log(`Received callMultiple event for IPs: ${ips.join(', ')}`);
-    showCallModal(ips);
+// Listen for incoming call events
+socket.on('incomingCall', (data) => {
+    const { callId, ip } = data;
+    console.log(`Incoming call from IP: ${ip} with Call ID: ${callId}`);
+    showCallModal(ip, callId);
 });
+
+// Function to get the device's IP address
+function getDeviceIp() {
+    // Implement a method to retrieve the device's actual IP address.
+    // This might require server-side assistance or environment-specific code.
+    // For demonstration, returning a placeholder:
+    return "192.168.8.67"; // Replace with actual IP retrieval logic
+}
 
 // Function to display the call modal
-function showCallModal(callerInfo) {
-    if (Array.isArray(callerInfo)) {
-        callStatusElement.innerHTML = `Incoming Calls from:<br>${callerInfo.join('<br>')}`;
-    } else {
-        callStatusElement.textContent = `Incoming Call from ${callerInfo}`;
-    }
-    callModal.style.display = 'flex';
+function showCallModal(callerIp, callId) {
+    callStatusElement.textContent = `Incoming Call from ${callerIp}`;
+    callModal.style.display = "flex"; // Make sure modal is visible
+    callModal.setAttribute('data-call-id', callId); // Store Call ID in modal
 }
 
 // Function to hide the call modal
 function hideCallModal() {
-    callModal.style.display = 'none';
+    callModal.style.display = "none";
     callStatusElement.textContent = 'Incoming Call...';
-}
-
-// Function to extract IP from the call status element
-function extractIpFromStatus() {
-    const text = callStatusElement.textContent;
-    const ipMatch = text.match(/from\s([0-9.]+)/);
-    return ipMatch ? ipMatch[1] : 'Unknown IP';
+    callModal.removeAttribute('data-call-id');
 }
 
 // Event listener for close (X) button
@@ -61,75 +63,31 @@ closeModal.addEventListener('click', hideCallModal);
 
 // Event listener for Pickup button
 pickupButton.addEventListener('click', () => {
+    const callId = callModal.getAttribute('data-call-id');
+    const ip = callModal.getAttribute('data-call-ip') || extractIpFromStatus();
     console.log('Call accepted.');
-    // Emit 'callResponse' to the server
-    socket.emit('callResponse', { ip: extractIpFromStatus(), response: 'accepted' });
+    // Emit 'callResponse' to the server with Call ID
+    socket.emit('callResponse', { callId, response: 'accepted' });
     // Implement additional pickup call logic here
     hideCallModal();
 });
 
 // Event listener for Reject button
 rejectButton.addEventListener('click', () => {
+    const callId = callModal.getAttribute('data-call-id');
+    const ip = callModal.getAttribute('data-call-ip') || extractIpFromStatus();
     console.log('Call rejected.');
-    // Emit 'callResponse' to the server
-    socket.emit('callResponse', { ip: extractIpFromStatus(), response: 'rejected' });
+    // Emit 'callResponse' to the server with Call ID
+    socket.emit('callResponse', { callId, response: 'rejected' });
     // Implement additional reject call logic here
     hideCallModal();
 });
 
-function launchVideoChat() {
-    // Open the video chat in a new window with maximum dimensions
-    const width = screen.width;
-    const height = screen.height;
-    const videoChatWindow = window.open(
-        "http://192.168.8.67:3012/video-chat.html",
-        "VideoChat",
-        `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
-    );
-
-    if (videoChatWindow) {
-        videoChatWindow.focus();
-
-        // Wait for the window to load
-        videoChatWindow.onload = function () {
-            // Add fullscreen request script to the new window
-            const script = videoChatWindow.document.createElement("script");
-            script.textContent = `
-            // Function to request fullscreen
-            function enterFullscreen() {
-                const element = document.documentElement;
-                if (element.requestFullscreen) {
-                    element.requestFullscreen();
-                } else if (element.webkitRequestFullscreen) { // Safari
-                    element.webkitRequestFullscreen();
-                } else if (element.msRequestFullscreen) { // IE11
-                    element.msRequestFullscreen();
-                }
-            }
-
-            // Add click listener to enter fullscreen on first interaction
-            document.addEventListener('click', function fullscreenHandler() {
-                enterFullscreen();
-                // Remove the listener after first click
-                document.removeEventListener('click', fullscreenHandler);
-            }, { once: true });
-
-            // Add visible instructions
-            const instructions = document.createElement('div');
-            instructions.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999;';
-            instructions.textContent = 'Click anywhere to enter fullscreen mode';
-            document.body.appendChild(instructions);
-
-            // Remove instructions after entering fullscreen
-            document.addEventListener('fullscreenchange', function() {
-                if (document.fullscreenElement) {
-                    instructions.remove();
-                }
-            });
-        `;
-            videoChatWindow.document.body.appendChild(script);
-        };
-    }
+// Function to extract IP from the call status element (if needed)
+function extractIpFromStatus() {
+    const text = callStatusElement.textContent;
+    const ipMatch = text.match(/from\s([0-9.]+)/);
+    return ipMatch ? ipMatch[1] : 'Unknown IP';
 }
 
 // Array to keep track of selected devices
@@ -140,6 +98,7 @@ let selectionMode = false;
 
 // Function to render online devices
 function renderOnlineDevices() {
+    userListElement.innerHTML = ''; // Clear existing list
     onlineList.forEach((device, index) => {
         // Create user item container
         const userItem = document.createElement("div");
@@ -248,8 +207,6 @@ function handleCall() {
             const ip = selectedDevices[0].ip;
             callSingle(ip);
         }
-        // Optionally, open the call modal immediately
-        // openCallModal();
         // After calling, clear selections
         clearSelections();
     }
@@ -257,10 +214,7 @@ function handleCall() {
 
 // Function to call a single device
 function callSingle(ip) {
-    const url = `http://${ip}:3000/api/call`;
-    console.log(`Initiating call to ${url}`);
-
-    fetch(url, {
+    fetch('http://localhost:3000/api/call', { // Ensure the backend URL is correct
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -269,40 +223,45 @@ function callSingle(ip) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Call initiated:', data);
-            // Update call status or handle response
-
-            callStatusElement.textContent = `Call initiated for IP: ${ip}`;
+            if (data.message) {
+                console.log('Call initiated:', data.message);
+                // Optionally, display a notification to the initiator
+            }
+            if (data.error) {
+                console.error('Error initiating call:', data.error);
+                // Optionally, display an error notification
+            }
         })
         .catch(error => {
             console.error('Error initiating call:', error);
-            callStatusElement.textContent = `Error initiating call for IP: ${ip}`;
+            // Optionally, display an error notification
         });
 }
 
-// Function to call multiple devices without waiting for responses
+// Function to call multiple devices
 function callMultiple(ips) {
-    ips.forEach(ip => {
-        const url = `http://${ip}:3000/api/call`;
-        console.log(`Initiating call to ${url}`);
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ip: ip })
+    fetch('http://localhost:3000/api/call', { // Ensure the backend URL is correct
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ip: ips })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                console.log('Calls initiated:', data.message);
+                // Optionally, display a notification to the initiator
+            }
+            if (data.error) {
+                console.error('Error initiating calls:', data.error);
+                // Optionally, display an error notification
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(`Call initiated for ${ip}:`, data);
-
-                // Optionally handle individual responses
-            })
-            .catch(error => {
-                console.error(`Error initiating call for ${ip}:`, error);
-            });
-    });
+        .catch(error => {
+            console.error('Error initiating calls:', error);
+            // Optionally, display an error notification
+        });
 }
 
 // Function to handle Cancel button click
@@ -321,32 +280,12 @@ function clearSelections() {
     selectionMode = false;
 }
 
-// Function to open the Call Modal
-function openCallModal() {
-    callStatusElement.textContent = "Calling...";
-    callModal.style.display = "flex";
-}
-
-// Function to open the Call Modal for a single device
-function openCallModalForDevice(device) {
-    callStatusElement.textContent = "Calling...";
-    callModal.style.display = "flex";
-    callSingle(device.ip); // Invoke callSingle with the device's IP
-}
-
-// Function to close the Call Modal
-function closeCallModal() {
-    callModal.style.display = "none";
-    // Optionally, clear selection if any
-    clearSelections();
-}
-
 // Add event listeners to action buttons
 callButton.addEventListener("click", handleCall);
 cancelButton.addEventListener("click", handleCancel);
 
 // Add event listener to close modal
-closeModal.addEventListener("click", closeCallModal);
+closeModal.addEventListener("click", hideCallModal);
 
 // Function to handle clicks outside the user list, action buttons, and modal
 function handleClickOutside(event) {
@@ -405,6 +344,7 @@ const logsElement = document.getElementById("logs");
 
 // Function to render call logs
 function renderCallLogs() {
+    logsElement.innerHTML = ''; // Clear existing logs
     logs.forEach(log => {
         // Create log item container
         const logItem = document.createElement("div");
