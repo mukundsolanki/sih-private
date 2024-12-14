@@ -1,4 +1,6 @@
 // Sample onlineList data (you might be fetching this dynamically in a real application)
+
+server_ip = "192.168.8.67"
 const onlineList = [
     { name: "Intercom 1", ip: "192.168.8.67" },
     { name: "Intercom 2", ip: "192.168.1.2" },
@@ -70,6 +72,7 @@ pickupButton.addEventListener('click', () => {
     socket.emit('callResponse', { callId, response: 'accepted' });
     // Implement additional pickup call logic here
     hideCallModal();
+    launchVideoChat(); // Call the launchVideoChat function
 });
 
 // Event listener for Reject button
@@ -132,6 +135,61 @@ function renderOnlineDevices() {
         // Add selection listeners
         addSelectionListeners(userItem, device);
     });
+}
+
+function launchVideoChat() {
+    // Open the video chat in a new window with maximum dimensions
+    const width = screen.width;
+    const height = screen.height;
+    const videoChatWindow = window.open(
+        "http://" + server_ip + ":3012/video-chat.html",
+        "VideoChat",
+        `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
+    );
+
+    if (videoChatWindow) {
+        videoChatWindow.focus();
+
+        // Wait for the window to load
+        videoChatWindow.onload = function () {
+            // Add fullscreen request script to the new window
+            const script = videoChatWindow.document.createElement("script");
+            script.textContent = `
+            // Function to request fullscreen
+            function enterFullscreen() {
+                const element = document.documentElement;
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.webkitRequestFullscreen) { // Safari
+                    element.webkitRequestFullscreen();
+                } else if (element.msRequestFullscreen) { // IE11
+                    element.msRequestFullscreen();
+                }
+            }
+
+            // Add click listener to enter fullscreen on first interaction
+            document.addEventListener('click', function fullscreenHandler() {
+                enterFullscreen();
+                // Remove the listener after first click
+                document.removeEventListener('click', fullscreenHandler);
+            }, { once: true });
+
+            // Add visible instructions
+            const instructions = document.createElement('div');
+            instructions.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999;';
+            instructions.textContent = 'Click anywhere to enter fullscreen mode';
+            document.body.appendChild(instructions);
+
+            // Remove instructions after entering fullscreen
+            document.addEventListener('fullscreenchange', function() {
+                if (document.fullscreenElement) {
+                    instructions.remove();
+                }
+            });
+        `;
+            videoChatWindow.document.body.appendChild(script);
+        };
+    }
 }
 
 // Function to add selection listeners to an element
@@ -214,27 +272,30 @@ function handleCall() {
 
 // Function to call a single device
 function callSingle(ip) {
-    fetch('http://localhost:3000/api/call', { // Ensure the backend URL is correct
+    fetch('http://' + ip + ':3000/api/call', { // Ensure the backend URL is correct
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ ip: ip })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                console.log('Call initiated:', data.message);
-                // Optionally, display a notification to the initiator
-            }
-            if (data.error) {
-                console.error('Error initiating call:', data.error);
-                // Optionally, display an error notification
+        .then(response => {
+            if (response.status === 200) {
+                launchVideoChat(); // Call the launchVideoChat function
+                return response.json();
+            } else {
+                return response.json().then(errData => {
+                    throw new Error(errData.error || 'Call initiation failed');
+                });
             }
         })
+        .then(data => {
+            console.log('Call response:', data.message);
+            // Additional handling if needed
+        })
         .catch(error => {
-            console.error('Error initiating call:', error);
-            // Optionally, display an error notification
+            console.error('Error initiating call:', error.message);
+            // Handle errors (e.g., display a notification to the user)
         });
 }
 
