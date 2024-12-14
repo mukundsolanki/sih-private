@@ -5,214 +5,216 @@
     <script src="/simple-peer/simplepeer.min.js"></script>
     <style>
       body {
-        background-color: black;
+        background-color: rgb(255, 255, 255);
         font-family: Arial, sans-serif;
         color: white;
         margin: 0;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .main-container {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         height: 100vh;
       }
 
-      .container {
+      /* Left sidebar for chat */
+      .chat-sidebar {
+        width: 300px;
+        background: rgba(56, 56, 56, 0.8);
+        padding: 15px;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: rgb(56, 56, 56);
-        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      .vid {
-        flex: 0 1 auto;
-        height: 400px;
-        position: relative; /* To position the select box */
+      .user-list {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 8px;
+        max-height: 150px;
+        overflow-y: auto;
       }
 
-      .settings.red {
-        color: red; /* Text color red when disabled */
+      .chat-messages {
+        flex-grow: 1;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        overflow-y: auto;
+        margin: 10px 0;
       }
 
-      .vid-container {
+      .chat-input {
+        display: flex;
+        gap: 10px;
+        padding: 10px;
+      }
+
+      /* Main content area */
+      .content-area {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         position: relative;
       }
 
-      .select-box {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
+      /* Main video container */
+      .video-container {
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow-y: auto;
       }
 
-      .button-container {
+      .remote-video {
+        width: 45%;
+        min-width: 300px;
+        max-height: 400px;
+        border-radius: 10px;
+        background: rgba(56, 56, 56, 0.8);
+      }
+
+      /* Local video (bottom right) */
+      #localVideo {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 250px;
+        height: 180px;
+        border-radius: 10px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Controls bar */
+      .controls-bar {
+        padding: 15px;
+        background: rgba(56, 56, 56, 0.8);
         display: flex;
         justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
+        gap: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
 
+      /* Transcription box */
+      #transcription-box {
+        position: fixed;
+        bottom: 80px;
+        left: 320px; /* Adjusted to account for sidebar */
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 8px;
+        padding: 15px;
+        z-index: 90;
+      }
+
+      /* Enhanced button styles */
       .settings {
         background: rgba(255, 255, 255, 0.2);
         border: none;
         color: white;
         padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        font-size: 14px;
+        border-radius: 20px;
         cursor: pointer;
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        transition: background 0.3s ease, color 0.3s ease;
+        transition: all 0.3s ease;
       }
 
       .settings:hover {
-        background: rgba(255, 255, 255, 0.4);
-        color: black;
-      }
-
-      #videos {
-        margin-bottom: 20px;
-      }
-      #localVideo {
-        position: fixed; /* Position fixed to the viewport */
-        bottom: 20px; /* 10px from the bottom */
-        right: 20px; /* 10px from the right */
-        width: 250x; /* Adjust width as needed */
-        height: auto; /* Maintain aspect ratio */
-      }
-      .icon-button {
-        background: none;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        border-radius: 15px;
-        transition: background 0.3s ease, color 0.3s ease;
-      }
-
-      .icon-button img {
-        width: 20px; /* Adjust icon size as needed */
-        height: auto;
-        filter: invert(1); /* Invert the icon color to white */
-      }
-
-      .icon-button.red img {
-        filter: invert(0) hue-rotate(180deg) saturate(10); /* Red color */
-      }
-
-      .input-group.centered {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 10px;
-      }
-
-      .text-input.rounded {
-        border-radius: 5px;
-        padding: 5px;
-        margin-right: 5px;
-      }
-      .user-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-
-      .user-checkbox {
-        display: flex;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 5px;
-        border-radius: 5px;
-      }
-
-      .settings.frosted {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 5px;
-        backdrop-filter: blur(10px);
-        padding: 5px 10px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-      }
-
-      .settings.frosted:hover {
         background: rgba(255, 255, 255, 0.3);
       }
 
-      #transcription-box {
-        background: rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 15px;
-        margin: 10px 0;
-        max-width: 600px;
-        min-height: 50px;
-        width: 100%;
+      .settings:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
 
-      .transcription-text {
-        color: #fff;
-        font-size: 16px;
-        line-height: 1.4;
-        white-space: normal;
-        overflow: hidden;
-        transition: all 0.3s ease;
+      /* Input styles */
+      input[type="text"] {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 8px 15px;
+        color: white;
+        flex-grow: 1;
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      select.settings {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 8px 15px;
+      }
+
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
       }
     </style>
   </head>
-
   <body>
-    <div id="videos" class="container"></div>
-
-    <div class="button-container">
-      <div>
-        <button id="muteButton" class="settings" onclick="toggleMute()">
-          Mute
-        </button>
-        <button id="vidButton" class="settings" onclick="toggleVid()">
-          Video
-        </button>
+    <div class="main-container">
+      <!-- Left Chat Sidebar -->
+      <div class="chat-sidebar">
+        <div class="user-list" id="user-list">
+          <!-- User checkboxes will be populated here -->
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <!-- Chat messages will appear here -->
+        </div>
+        <div class="chat-input">
+          <input type="text" id="message-input" placeholder="Type your message..." />
+          <button class="settings" onclick="sendMessage()">Send</button>
+        </div>
       </div>
-      
-    </div>
-    <video id="localVideo" class="vid" autoplay muted></video>
-    <div id="chat-container">
-      <div id="user-list" class="user-list"></div>
-      <div id="chat-messages"></div>
-      <input
-        type="text"
-        id="message-input"
-        placeholder="Type your message..."
-      />
-      <button id="send-message" class="settings" onclick="sendMessage()">
-        Send
-      </button>
+
+      <!-- Main Content Area -->
+      <div class="content-area">
+        <!-- Main Video Container -->
+        <div class="video-container" id="videos">
+          <!-- Remote video streams will be added here -->
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="controls-bar">
+          <button id="muteButton" class="settings" onclick="toggleMute()">Mute</button>
+          <button id="vidButton" class="settings" onclick="toggleVid()">Video</button>
+          <select id="language" class="settings">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+          </select>
+          <button id="startBtn" class="settings">Start Recording</button>
+          <button id="stopBtn" class="settings" disabled>Stop Recording</button>
+        </div>
+      </div>
+
+      <!-- Local Video -->
+      <video id="localVideo" autoplay muted></video>
+
+      <!-- Transcription Box -->
+      <div id="transcription-box">
+        <div class="transcription-text"></div>
+      </div>
     </div>
 
-    <h1>Real-time Speech to Text</h1>
-
-    <div id="caption-messages"></div>
-
-    <div id="controls">
-      <select id="language">
-        <option value="en">English</option>
-        <option value="hi">Hindi</option>
-      </select>
-      <button id="startBtn">Start Recording</button>
-      <button id="stopBtn" disabled>Stop Recording</button>
-    </div>
-
-    <div id="transcription-box">
-      <div class="transcription-text"></div>
-    </div>
-    <div id="output"></div>
 
     <footer>
       <script src="/js/main.js" lang="text/javascript"></script>
