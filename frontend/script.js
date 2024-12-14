@@ -39,11 +39,18 @@ socket.on('incomingCall', (data) => {
 });
 
 // Function to get the device's IP address
-function getDeviceIp() {
+async function getDeviceIp() {
     // Implement a method to retrieve the device's actual IP address.
     // This might require server-side assistance or environment-specific code.
     // For demonstration, returning a placeholder:
-    return "192.168.8.67"; // Replace with actual IP retrieval logic
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.error('Error fetching IP address:', error);
+        return null;
+    }
 }
 
 // Function to display the call modal
@@ -278,51 +285,49 @@ function callSingle(ip) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ ip: ip })
-    })
-        .then(response => {
-            if (response.status === 200) {
-                launchVideoChat(); // Call the launchVideoChat function
-                return response.json();
-            } else {
-                return response.json().then(errData => {
-                    throw new Error(errData.error || 'Call initiation failed');
-                });
-            }
-        })
-        .then(data => {
-            console.log('Call response:', data.message);
-            // Additional handling if needed
-        })
-        .catch(error => {
-            console.error('Error initiating call:', error.message);
-            // Handle errors (e.g., display a notification to the user)
-        });
+    }).then(response => {
+        if (response.status === 200) {
+            launchVideoChat(); // Call the launchVideoChat function
+            return response.json();
+        } else {
+            return response.json().then(errData => {
+                throw new Error(errData.error || 'Call initiation failed');
+            });
+        }
+    }).then(data => {
+        console.log('Call response:', data.message);
+        // Additional handling if needed
+    }).catch(error => {
+        console.error('Error initiating call:', error.message);
+        // Handle errors (e.g., display a notification to the user)
+    });
 }
 
 // Function to call multiple devices
 function callMultiple(ips) {
-    fetch('http://localhost:3000/api/call', { // Ensure the backend URL is correct
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ip: ips })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                console.log('Calls initiated:', data.message);
-                // Optionally, display a notification to the initiator
-            }
-            if (data.error) {
-                console.error('Error initiating calls:', data.error);
-                // Optionally, display an error notification
-            }
-        })
-        .catch(error => {
-            console.error('Error initiating calls:', error);
-            // Optionally, display an error notification
-        });
+    // fetch('http://localhost:3000/api/call', { // Ensure the backend URL is correct
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({ ip: ips })
+    // })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.message) {
+    //             console.log('Calls initiated:', data.message);
+    //             // Optionally, display a notification to the initiator
+    //         }
+    //         if (data.error) {
+    //             console.error('Error initiating calls:', data.error);
+    //             // Optionally, display an error notification
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error initiating calls:', error);
+    //         // Optionally, display an error notification
+    //     });
+    launchVideoChat(); // Call the launchVideoChat function
 }
 
 // Function to handle Cancel button click
