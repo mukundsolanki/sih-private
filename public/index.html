@@ -145,6 +145,26 @@
       .settings.frosted:hover {
         background: rgba(255, 255, 255, 0.3);
       }
+
+      #transcription-box {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        max-width: 600px;
+        min-height: 50px;
+        width: 100%;
+      }
+
+      .transcription-text {
+        color: #fff;
+        font-size: 16px;
+        line-height: 1.4;
+        white-space: normal;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
     </style>
   </head>
 
@@ -160,22 +180,7 @@
           Video
         </button>
       </div>
-
-      <div class="input-group centered">
-        <input
-          type="text"
-          id="newTextInput"
-          class="text-input rounded"
-          placeholder="Enter new text here"
-        />
-        <button
-          id="newTextButton"
-          class="settings frosted"
-          onclick="handleNewTextInput()"
-        >
-          Submit
-        </button>
-      </div>
+      
     </div>
     <video id="localVideo" class="vid" autoplay muted></video>
     <div id="chat-container">
@@ -191,11 +196,10 @@
       </button>
     </div>
 
-
     <h1>Real-time Speech to Text</h1>
 
     <div id="caption-messages"></div>
-    
+
     <div id="controls">
       <select id="language">
         <option value="en">English</option>
@@ -204,9 +208,11 @@
       <button id="startBtn">Start Recording</button>
       <button id="stopBtn" disabled>Stop Recording</button>
     </div>
-    <div id="output"></div>
 
-    
+    <div id="transcription-box">
+      <div class="transcription-text"></div>
+    </div>
+    <div id="output"></div>
 
     <footer>
       <script src="/js/main.js" lang="text/javascript"></script>
@@ -291,19 +297,34 @@
               );
             };
 
+            // websocket.onmessage = (event) => {
+            //   const data = JSON.parse(event.data);
+            //   if (data.type === "final") {
+            //     // Set the transcribed text to the message input field
+            //     const messageInput = document.getElementById("message-input");
+            //     messageInput.value = data.text;
+
+            //     // Call the sendMessage function to send the transcribed message
+            //     if (typeof sendCaption === "function") {
+            //       sendCaption();
+            //     } else {
+            //       console.error("sendMessage function is not defined");
+            //     }
+            //   }
+            // };
+
             websocket.onmessage = (event) => {
               const data = JSON.parse(event.data);
               if (data.type === "final") {
-                // Set the transcribed text to the message input field
-                const messageInput = document.getElementById("message-input");
-                messageInput.value = data.text;
+                // Only send to peers, don't display locally
+                const transcriptionData = {
+                  text: data.text,
+                  sender: socket.id,
+                  type: "transcription",
+                };
 
-                // Call the sendMessage function to send the transcribed message
-                if (typeof sendCaption === "function") {
-                  sendCaption();
-                } else {
-                  console.error("sendMessage function is not defined");
-                }
+                // Emit transcription to peers
+                socket.emit("transcription", transcriptionData);
               }
             };
 

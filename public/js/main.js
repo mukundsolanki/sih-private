@@ -653,6 +653,14 @@ function init() {
         }
     })
 
+    socket.on('transcription', data => {
+        displayTranscription({
+            text: data.text,
+            sender: `Peer ${data.sender.substring(0, 5)}`,
+            isLocal: false
+        });
+    });
+
     socket.on('signal', data => {
         peers[data.socket_id].signal(data.signal)
     })
@@ -673,7 +681,32 @@ function init() {
             });
         }
     });
-    
+
+}
+
+
+function displayTranscription(data) {
+    if (data.sender !== socket.id) {
+        const transcriptionDiv = document.querySelector('.transcription-text');
+        
+        // Append new text to existing content
+        const currentText = transcriptionDiv.textContent || '';
+        const newWords = data.text.split(' ');
+        const allWords = [...currentText.split(' '), ...newWords];
+        
+        // Keep only last 10 words
+        const recentWords = allWords.slice(-10);
+        transcriptionDiv.textContent = recentWords.join(' ');
+        
+        // Set timer to remove old words
+        setTimeout(() => {
+            const words = transcriptionDiv.textContent.split(' ');
+            if (words.length > 5) {
+                // Remove first 5 words
+                transcriptionDiv.textContent = words.slice(5).join(' ');
+            }
+        }, 5000);
+    }
 }
 
 /**

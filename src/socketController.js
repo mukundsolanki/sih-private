@@ -42,6 +42,11 @@ module.exports = (io) => {
             })
         })
 
+        socket.on('transcription', (data) => {
+            // Broadcast transcription to all connected peers
+            socket.broadcast.emit('transcription', data);
+        });
+
         /**
          * remove the disconnected peer connection from all other connected clients
          */
