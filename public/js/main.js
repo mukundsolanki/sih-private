@@ -688,16 +688,16 @@ function init() {
 function displayTranscription(data) {
     if (data.sender !== socket.id) {
         const transcriptionDiv = document.querySelector('.transcription-text');
-        
+
         // Append new text to existing content
         const currentText = transcriptionDiv.textContent || '';
         const newWords = data.text.split(' ');
         const allWords = [...currentText.split(' '), ...newWords];
-        
+
         // Keep only last 10 words
         const recentWords = allWords.slice(-10);
         transcriptionDiv.textContent = recentWords.join(' ');
-        
+
         // Set timer to remove old words
         setTimeout(() => {
             const words = transcriptionDiv.textContent.split(' ');
@@ -755,60 +755,171 @@ function addPeer(socket_id, am_initiator) {
         })
     })
 
-    peers[socket_id].on('stream', stream => {
-        let newVid = document.createElement('video')
-        newVid.srcObject = stream
-        newVid.id = socket_id
-        newVid.playsinline = false
-        newVid.autoplay = true
-        newVid.className = "vid"
-        newVid.onclick = () => openPictureMode(newVid)
-        newVid.ontouchstart = (e) => openPictureMode(newVid)
+    // peers[socket_id].on('stream', stream => {
+    //     let newVid = document.createElement('video');
+    //     newVid.srcObject = stream;
+    //     newVid.id = socket_id;
+    //     newVid.playsinline = false;
+    //     newVid.autoplay = true;
+    //     newVid.className = "vid";
+    //     newVid.onclick = () => openPictureMode(newVid);
+    //     newVid.ontouchstart = (e) => openPictureMode(newVid);
 
-        // Create a container for the video and checkbox
+    //     // Create a container for the video and text
+    //     let vidContainer = document.createElement('div');
+    //     vidContainer.className = "vid-container";
+    //     vidContainer.appendChild(newVid);
+
+    //     // Create the socket ID text element
+    //     let socketIdText = document.createElement('div');
+    //     socketIdText.className = "socket-id-text";
+    //     socketIdText.textContent = `${socket_id}`;
+
+    //     // Append the socket ID text to the container
+    //     vidContainer.appendChild(socketIdText);
+
+    //     // Add the container to the videos element
+    //     videos.appendChild(vidContainer);
+
+    //     updatePeerList();
+    // });
+
+    // peers[socket_id].on('stream', stream => {
+    //     let newVid = document.createElement('video');
+    //     newVid.srcObject = stream;
+    //     newVid.id = socket_id;
+    //     newVid.playsinline = false;
+    //     newVid.autoplay = true;
+    //     newVid.className = "vid";
+    //     newVid.onclick = () => openPictureMode(newVid);
+    //     newVid.ontouchstart = (e) => openPictureMode(newVid);
+
+    //     // Create a container for the video and text
+    //     let vidContainer = document.createElement('div');
+    //     vidContainer.className = "vid-container";
+    //     vidContainer.appendChild(newVid);
+
+    //     // Create the socket ID text element
+    //     let socketIdText = document.createElement('div');
+    //     socketIdText.className = "socket-id-text";
+    //     socketIdText.textContent = `${socket_id}`;
+
+    //     // Append the socket ID text to the container
+    //     vidContainer.appendChild(socketIdText);
+
+    //     // Add the container to the videos element
+    //     videos.appendChild(vidContainer);
+
+    //     updatePeerList();
+    //   });
+
+    peers[socket_id].on('stream', stream => {
+        let newVid = document.createElement('video');
+        newVid.srcObject = stream;
+        newVid.id = socket_id;
+        newVid.playsinline = false;
+        newVid.autoplay = true;
+        newVid.className = "vid";
+        newVid.onclick = () => openPictureMode(newVid);
+        newVid.ontouchstart = (e) => openPictureMode(newVid);
+
+        // Create a container for the video and text
         let vidContainer = document.createElement('div');
         vidContainer.className = "vid-container";
         vidContainer.appendChild(newVid);
 
-        // Create the checkbox container
-        let checkboxContainer = document.createElement('div');
-        checkboxContainer.className = "checkbox-container";
+        // Create the socket ID text element
+        let socketIdText = document.createElement('div');
+        socketIdText.className = "socket-id-text";
+        socketIdText.textContent = `${socket_id}`;
 
-        // Create the checkbox element
-        let checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `checkbox-${socket_id}`;
-        checkbox.value = socket_id;
+        // Append the socket ID text to the container
+        vidContainer.appendChild(socketIdText);
 
-        // Create a label for the checkbox
-        let label = document.createElement('label');
-        label.htmlFor = `checkbox-${socket_id}`;
-        label.appendChild(document.createTextNode(socket_id)); // Or a user-friendly name
-
-        // Add the checkbox and label to the container
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(label);
-
-        // Add an event listener to the checkbox
-        checkbox.addEventListener('change', (event) => {
-            let selectedSocketId = event.target.value;
-            if (event.target.checked) {
-                console.log('Checkbox checked for:', selectedSocketId);
-                // Add socket ID to your tracking list
-                checkedSocketIds.push(selectedSocketId);
-            } else {
-                console.log('Checkbox unchecked for:', selectedSocketId);
-                // Remove socket ID from your tracking list
-                checkedSocketIds = checkedSocketIds.filter(id => id !== selectedSocketId);
-            }
-            console.log("Currently checked IDs:", checkedSocketIds);
-        });
-
-        vidContainer.appendChild(checkboxContainer);
+        // Add the container to the videos element
         videos.appendChild(vidContainer);
-        updatePeerList()
 
-    })
+        // Dynamically adjust video sizes
+        adjustVideoSizes();
+
+        updatePeerList();
+    });
+
+
+
+    function adjustVideoSizes() {
+        const videoContainers = document.querySelectorAll('.vid-container');
+        const totalVideos = videoContainers.length;
+
+        // CSS grid layout
+        const videosElement = document.getElementById('videos');
+        videosElement.style.display = 'grid';
+
+        if (totalVideos === 1) {
+            // Single video takes up most of the screen
+            videosElement.style.gridTemplateColumns = '1fr';
+            videoContainers.forEach(container => {
+                container.style.width = '50%';
+                container.style.height = '50vh';
+                container.style.justifySelf = 'center';
+            container.style.alignSelf = 'center';
+            container.style.placeSelf = 'center';
+            });
+        } else if (totalVideos === 2) {
+            // Two videos side by side
+            videosElement.style.gridTemplateColumns = '1fr 1fr';
+            videoContainers.forEach(container => {
+                container.style.width = '100%';
+                container.style.height = '50vh';
+            });
+        } else if (totalVideos <= 4) {
+            // Up to 4 videos in a 2x2 grid
+            videosElement.style.gridTemplateColumns = '1fr 1fr';
+            videoContainers.forEach(container => {
+                container.style.width = '100%';
+                container.style.height = '50vh';
+            });
+        } else {
+            // More than 4 videos in a responsive grid
+            const columns = Math.ceil(Math.sqrt(totalVideos));
+            videosElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            videoContainers.forEach(container => {
+                container.style.width = '100%';
+                container.style.height = '33vh';
+            });
+        }
+    }
+
+    // Add this CSS to your stylesheet for best results
+    const style = document.createElement('style');
+    style.textContent = `
+        #videos {
+            display: grid;
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+        }
+        .vid-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .vid-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .socket-id-text {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    `;
+    document.head.appendChild(style);
+
 }
 
 /**
@@ -898,7 +1009,13 @@ function removeLocalStream() {
 /**
  * Enable/disable microphone
  */
+
+let isMuted = false;
+
 function toggleMute() {
+    isMuted = !isMuted;
+    const micIcon = document.getElementById("micIcon");
+    micIcon.src = isMuted ? "assets/mic.svg" : "assets/mic_mute.svg";
     for (let index in localStream.getAudioTracks()) {
         localStream.getAudioTracks()[index].enabled = !localStream.getAudioTracks()[index].enabled
         muteButton.innerText = localStream.getAudioTracks()[index].enabled ? "Unmuted" : "Muted"
@@ -914,7 +1031,14 @@ function toggleMute() {
 /**
  * Enable/disable video
  */
+
+let isVideoOn = true;
+
 function toggleVid() {
+    isVideoOn = !isVideoOn;
+    const videoIcon = document.getElementById("videoIcon");
+    videoIcon.src = isVideoOn ? "assets/video_mute.svg" : "assets/video.svg";
+
     for (let index in localStream.getVideoTracks()) {
         localStream.getVideoTracks()[index].enabled = !localStream.getVideoTracks()[index].enabled
         const vidButton = document.getElementById('vidButton');
@@ -923,7 +1047,6 @@ function toggleVid() {
         } else {
             vidButton.classList.add('red');
         }
-        vidButton.innerText = localStream.getVideoTracks()[index].enabled ? "Video Enabled" : "Video Disabled"
     }
 }
 
