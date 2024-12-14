@@ -25,6 +25,16 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
+    // Listen for call responses from clients
+    socket.on('callResponse', (data) => {
+        const { ip, response } = data;
+        console.log(`Received response from ${ip}: ${response}`);
+
+        // Optional: Emit the response to another client or handle accordingly
+        // For example, notify the initiator about the response
+        // io.emit('callResponseToInitiator', { ip, response });
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
     });

@@ -9,8 +9,8 @@ const https = require('https')
 
 // insert your own ssl certificate and keys
 const options = {
-    key: fs.readFileSync(path.join(__dirname,'..','ssl','key.pem'), 'utf-8'),
-    cert: fs.readFileSync(path.join(__dirname,'..','ssl','cert.pem'), 'utf-8')
+    key: fs.readFileSync(path.join(__dirname, '..', 'ssl', 'key.pem'), 'utf-8'),
+    cert: fs.readFileSync(path.join(__dirname, '..', 'ssl', 'cert.pem'), 'utf-8')
 }
 
 const port = process.env.PORT || 3012

@@ -1,8 +1,8 @@
 // Sample onlineList data
 const onlineList = [
-    { name: "Intercom 1", ip: "192.168.1.1" },
+    { name: "Intercom 1", ip: "192.168.8.67" },
     { name: "Intercom 2", ip: "192.168.1.2" },
-    { name: "Intercom 3", ip: "127.0.0.1" },
+    { name: "Intercom 3", ip: "127.0.0.1" }, // Note: 127.0.0.1 refers to the local machine
     { name: "Intercom 4", ip: "192.168.1.4" },
     { name: "Intercom 5", ip: "192.168.1.5" },
     // Add more devices as needed
@@ -19,7 +19,7 @@ const pickupButton = document.getElementById('pickupButton');
 const rejectButton = document.getElementById('rejectButton');
 
 // Establish Socket.io connection
-const socket = io('http://localhost:3000'); // Update if your server is hosted elsewhere
+const socket = io('http://localhost:3000'); // Ensure this matches your backend URL
 
 // Listen for 'callSingle' event from the server
 socket.on('callSingle', (ip) => {
@@ -49,12 +49,40 @@ function hideCallModal() {
     callStatusElement.textContent = 'Incoming Call...';
 }
 
+// Function to extract IP from the call status element
+function extractIpFromStatus() {
+    const text = callStatusElement.textContent;
+    const ipMatch = text.match(/from\s([0-9.]+)/);
+    return ipMatch ? ipMatch[1] : 'Unknown IP';
+}
+
+// Event listener for close (X) button
+closeModal.addEventListener('click', hideCallModal);
+
+// Event listener for Pickup button
+pickupButton.addEventListener('click', () => {
+    console.log('Call accepted.');
+    // Emit 'callResponse' to the server
+    socket.emit('callResponse', { ip: extractIpFromStatus(), response: 'accepted' });
+    // Implement additional pickup call logic here
+    hideCallModal();
+});
+
+// Event listener for Reject button
+rejectButton.addEventListener('click', () => {
+    console.log('Call rejected.');
+    // Emit 'callResponse' to the server
+    socket.emit('callResponse', { ip: extractIpFromStatus(), response: 'rejected' });
+    // Implement additional reject call logic here
+    hideCallModal();
+});
+
 function launchVideoChat() {
     // Open the video chat in a new window with maximum dimensions
     const width = screen.width;
     const height = screen.height;
     const videoChatWindow = window.open(
-        "video-chat.html",
+        "http://192.168.8.67:3012/video-chat.html",
         "VideoChat",
         `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
     );
@@ -103,24 +131,6 @@ function launchVideoChat() {
         };
     }
 }
-
-// Event listener for close (X) button
-closeModal.addEventListener('click', hideCallModal);
-
-// Event listener for Pickup button
-pickupButton.addEventListener('click', () => {
-    console.log('Call picked up.');
-    // Implement pickup call logic here
-    hideCallModal();
-    launchVideoChat();
-});
-
-// Event listener for Reject button
-rejectButton.addEventListener('click', () => {
-    console.log('Call rejected.');
-    // Implement reject call logic here
-    hideCallModal();
-});
 
 // Array to keep track of selected devices
 const selectedDevices = [];
@@ -235,11 +245,11 @@ function handleCall() {
             callMultiple(ips);
         } else {
             // Single device selected
-            console.log("Single device selected:", selectedDevices[0]);
             const ip = selectedDevices[0].ip;
             callSingle(ip);
         }
-        openCallModal();
+        // Optionally, open the call modal immediately
+        // openCallModal();
         // After calling, clear selections
         clearSelections();
     }
@@ -247,7 +257,7 @@ function handleCall() {
 
 // Function to call a single device
 function callSingle(ip) {
-    const url = `http://${ip}/api/call`;
+    const url = `http://${ip}:3000/api/call`;
     console.log(`Initiating call to ${url}`);
 
     fetch(url, {
@@ -273,7 +283,7 @@ function callSingle(ip) {
 // Function to call multiple devices without waiting for responses
 function callMultiple(ips) {
     ips.forEach(ip => {
-        const url = `http://${ip}/api/call`;
+        const url = `http://${ip}:3000/api/call`;
         console.log(`Initiating call to ${url}`);
 
         fetch(url, {
