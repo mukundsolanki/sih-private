@@ -99,8 +99,8 @@ body {
   gap: 12px;
   padding: 12px;
   background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  /* border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08); */
 }
 
 .content-area {
@@ -109,7 +109,8 @@ body {
   flex-direction: column;
   position: relative;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.7);
+  /* background: rgba(255, 255, 255, 0.7); */
+  background-color: #2a2929;
 }
 
 .video-container {
@@ -156,6 +157,8 @@ body {
   gap: 25px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  width: 70%;
 }
 
 /* #transcription-box {
@@ -179,7 +182,7 @@ body {
   top: 20px;
   right: 20px;
   width: 300px;
-  height: 50px;
+  height: 70px;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 12px;
   padding: 15px;
@@ -200,9 +203,9 @@ body {
 .transcription-text {
   /* height: calc(100% - 35px); */
   color: #000000;
-  font-size: 14px;
+  font-size: 30px;
   line-height: 1.5;
-  padding: 5px;
+  /* padding: 5px; */
 }
 
 
@@ -246,13 +249,15 @@ body {
 
 input[type="text"] {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 25px;
+  height: 50px;
+  /* border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 25px; */
   padding: 12px 20px;
   color: #2c3e50;
   flex-grow: 1;
   font-size: 15px;
   transition: all 0.2s ease;
+  height: 30px;
 }
 
 input[type="text"]::placeholder {
@@ -321,7 +326,7 @@ select.settings {
 } */
 
 #caption-head {
-  font-size: 14px;
+  font-size: 30px;
   font-weight: 600;
   padding-bottom: 8px;
   margin-bottom: 8px;
@@ -331,7 +336,7 @@ select.settings {
 
 .socket-id-text {
   color: #2c3e50;
-  font-size: 14px;
+  font-size: 25px;
   margin-top: 8px;
 }
 
@@ -343,6 +348,7 @@ select.settings {
 }
 
 .collapse-btn {
+  height: 40px;
   background-color: white;
   border: none; 
   padding: 10px; 
@@ -356,3 +362,39 @@ select.settings {
 
 
 
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Add some space between input and button */
+  background-color: #000000;
+}
+
+.message-input {
+  width: 100%;
+  /* padding: 12px 16px; */
+  font-size: 50px; /* Increase font size */
+  /* border: 2px solid #ccc;
+  border-radius: 8px; */
+}
+
+.sendButton {
+  padding: 12px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sendButton img {
+  width: 32px;
+  height: 32px;
+}
+
+
+.parent-container {
+  display: flex;
+  justify-content: center;
+}

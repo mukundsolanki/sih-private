@@ -551,7 +551,7 @@ function displayMessage(data) {
     const messageEl = document.createElement('div');
 
     messageEl.innerHTML = `<strong>${data.sender}:</strong> ${data.message}`;
-    messageEl.style.color = data.isLocal ? 'lightgreen' : 'white';
+    messageEl.style.color = data.isLocal ? 'black' : 'black';
 
     chatMessages.appendChild(messageEl);
     chatMessages.scrollTop = chatMessages.scrollHeight;

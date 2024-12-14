@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script lang="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script src="/simple-peer/simplepeer.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Left Chat Sidebar -->
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <h2>VYANJAK</h2>
+          <button class="collapse-btn" onclick="toggleSidebar()">
+            <img
+              src="assets/sidebar_close.svg"
+              alt="Collapse"
+              width="50"
+              height="50"
+              id="collapse-icon"
+            />
+          </button>
+        </div>
+
+        <div class="user-list">
+          <div>
+            <p
+              style="
+                margin-bottom: 3;
+                margin-top: 0;
+                text-align: center;
+                font-size: 30px;
+              "
+            >
+              Select peers to chat
+            </p>
+          </div>
+          <!-- User checkboxes will be populated here -->
+          <div id="user-list" style="font-size: 30px"></div>
+        </div>
+        <div class="chat-messages" id="chat-messages" style="font-size: 30px">
+          <!-- Chat messages will appear here -->
+        </div>
+
+        <div class="chat-input">
+          <input
+            type="text"
+            id="message-input"
+            class="message-input"
+            placeholder="Type your message..."
+          />
+          <button class="sendButton" onclick="sendMessage()">
+            <img
+              id="sendIcon"
+              src="assets/send.svg"
+              alt="Send"
+              width="32"
+              height="32"
+            />
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="content-area">
+        <!-- Main Video Container -->
+        <div class="video-container" id="videos">
+          <!-- Remote video streams will be added here -->
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="parent-container">
+          <div class="controls-bar">
+            <button class="settings hang-button" onclick="closeWindow()">
+              <img
+                id="hangIcon"
+                src="assets/hang.svg"
+                alt="Hang Up"
+                width="24"
+                height="24"
+              />
+            </button>
+
+            <button id="muteButton" class="settings" onclick="toggleMute()">
+              <img
+                id="micIcon"
+                src="assets/mic_mute.svg"
+                alt="Mic"
+                width="24"
+                height="24"
+              />
+            </button>
+
+            <button id="vidButton" class="settings" onclick="toggleVid()">
+              <img
+                id="videoIcon"
+                src="assets/video_mute.svg"
+                alt="Video"
+                width="24"
+                height="24"
+              />
+            </button>
+
+            <select id="language" class="settings">
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
+            </select>
+            <button id="startBtn" class="settings">
+              <img
+                id="videoIcon"
+                src="assets/speak.svg"
+                alt="Video"
+                width="24"
+                height="24"
+              />
+            </button>
+            <button id="stopBtn" class="settings" disabled>Stop</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Video -->
+      <video id="localVideo" autoplay muted></video>
+
+      <!-- Transcription Box -->
+      <div id="transcription-box">
+        <div id="caption-head">Live Captions</div>
+        <div class="transcription-text"></div>
+      </div>
+    </div>
+
+    <footer>
+      <script src="/js/script.js" lang="text/javascript"></script>
+      <script src="/js/main.js" lang="text/javascript"></script>
+
+      
+    </footer>
+  </body>
+</html>

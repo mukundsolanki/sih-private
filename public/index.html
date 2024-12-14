@@ -1,276 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <script lang="text/javascript" src="/socket.io/socket.io.js"></script>
-    <script src="/simple-peer/simplepeer.min.js"></script>
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Chat Launcher</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #4a5568;
+        margin-bottom: 2rem;
+      }
+
+      .start-btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .start-btn:hover {
+        background-color: #45a049;
+      }
+    </style>
   </head>
   <body>
-    <div class="main-container">
-      <!-- Left Chat Sidebar -->
-      <div class="chat-sidebar">
-        <div class="sidebar-header">
-          <h2>VYANJAK</h2>
-          <button class="collapse-btn" onclick="toggleSidebar()">
-            <img
-              src="assets/sidebar_close.svg"
-              alt="Collapse"
-              width="20"
-              height="20"
-              id="collapse-icon"
-            />
-          </button>
-        </div>
-
-        <div class="user-list">
-          <div>
-            <p style="margin-bottom: 3; margin-top: 0; text-align: center; font-size: 30px;">
-              Select peers to chat
-            </p>
-          </div>
-          <!-- User checkboxes will be populated here -->
-          <div id="user-list" style="font-size: 30px;"></div>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <!-- Chat messages will appear here -->
-        </div>
-        <div class="chat-input">
-          <input
-            type="text"
-            id="message-input"
-            placeholder="Type your message..."
-          />
-          <button class=" sendButton" onclick="sendMessage()">
-            <img
-              id="sendIcon"
-              src="assets/send.svg"
-              alt="Send"
-              width="24"
-              height="24"
-            />
-          </button>
-        </div>
-      </div>
-
-      <!-- Main Content Area -->
-      <div class="content-area">
-        <!-- Main Video Container -->
-        <div class="video-container" id="videos">
-          <!-- Remote video streams will be added here -->
-        </div>
-
-        <!-- Controls Bar -->
-        <div class="controls-bar">
-          <button class="settings hang-button" onclick="closeWindow()">
-            <img
-              id="hangIcon"
-              src="assets/hang.svg"
-              alt="Hang Up"
-              width="24"
-              height="24"
-            />
-          </button>
-
-          <button id="muteButton" class="settings" onclick="toggleMute()">
-            <img
-              id="micIcon"
-              src="assets/mic_mute.svg"
-              alt="Mic"
-              width="24"
-              height="24"
-            />
-          </button>
-
-          <button id="vidButton" class="settings" onclick="toggleVid()">
-            <img
-              id="videoIcon"
-              src="assets/video_mute.svg"
-              alt="Video"
-              width="24"
-              height="24"
-            />
-          </button>
-
-          <select id="language" class="settings">
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-          </select>
-          <button id="startBtn" class="settings">Speech to Text</button>
-          <button id="stopBtn" class="settings" disabled>Stop</button>
-        </div>
-      </div>
-
-      <!-- Local Video -->
-      <video id="localVideo" autoplay muted></video>
-
-      <!-- Transcription Box -->
-      <div id="transcription-box">
-        <div id="caption-head">Live Captions</div>
-        <div class="transcription-text"></div>
-      </div>
+    <div class="container">
+      <h1>Video Chat Application</h1>
+      <button class="start-btn" onclick="launchVideoChat()">
+        Start Video Chat
+      </button>
     </div>
 
-    <footer>
-      <script src="/js/main.js" lang="text/javascript"></script>
-      <script>
-        function toggleSidebar() {
-          const sidebar = document.querySelector(".chat-sidebar");
-          sidebar.classList.toggle("collapsed");
+    <script>
+      // function launchVideoChat() {
+      //     // Open the video chat in a new window
+      //     const width = 1200;
+      //     const height = 800;
+      //     const left = (screen.width - width) / 2;
+      //     const top = (screen.height - height) / 2;
 
-          if (sidebar.classList.contains("collapsed")) {
-            sidebar.style.backgroundColor = "transparent"; 
-          } else {
-            sidebar.style.backgroundColor = "";
-          }
-        }
+      //     const videoChatWindow = window.open(
+      //         'video_room.html', // Your video chat page
+      //         'VideoChat',
+      //         `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      //     );
 
-        function closeWindow() {
-          window.close();
-        }
+      //     // Optional: Focus on the new window
+      //     if (videoChatWindow) {
+      //         videoChatWindow.focus();
+      //     }
+      // }
 
-        function sendMessageHandler() {
-          // This will call the sendMessage function from main.js
-          if (typeof sendMessage === "function") {
-            sendMessage();
-          } else {
-            console.error("sendMessage function is not defined");
-          }
-        }
-      </script>
+    //   function launchVideoChat() {
+    //     // Open the video chat in a new window with fullscreen
+    //     const videoChatWindow = window.open(
+    //       "video_room.html", // Your video chat page
+    //       "VideoChat",
+    //       "fullscreen=yes,scrollbars=yes"
+    //     );
 
-      <script>
-        // AudioWorklet processor code as a string
-        const workletCode = `
-      class AudioProcessor extends AudioWorkletProcessor {
-          constructor() {
-              super();
-              this.bufferSize = 8192;
-              this.buffer = new Float32Array(this.bufferSize);
-              this.bufferedSamples = 0;
-          }
+    //     // Request fullscreen mode after window opens
+    //     if (videoChatWindow) {
+    //       videoChatWindow.focus();
+    //       // Add a small delay to ensure the window content is loaded
+    //       setTimeout(() => {
+    //         try {
+    //           // Try different fullscreen methods for browser compatibility
+    //           if (videoChatWindow.document.documentElement.requestFullscreen) {
+    //             videoChatWindow.document.documentElement.requestFullscreen();
+    //           } else if (
+    //             videoChatWindow.document.documentElement.mozRequestFullScreen
+    //           ) {
+    //             videoChatWindow.document.documentElement.mozRequestFullScreen();
+    //           } else if (
+    //             videoChatWindow.document.documentElement.webkitRequestFullscreen
+    //           ) {
+    //             videoChatWindow.document.documentElement.webkitRequestFullscreen();
+    //           } else if (
+    //             videoChatWindow.document.documentElement.msRequestFullscreen
+    //           ) {
+    //             videoChatWindow.document.documentElement.msRequestFullscreen();
+    //           }
+    //         } catch (e) {
+    //           console.log("Fullscreen request failed:", e);
+    //         }
+    //       }, 100);
+    //     }
+    //   }
+    
+    function launchVideoChat() {
+    // Open the video chat in a new window with maximum dimensions
+    const width = screen.width;
+    const height = screen.height;
+    const videoChatWindow = window.open(
+        'video-chat.html',
+        'VideoChat',
+        `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
+    );
 
-          process(inputs, outputs, parameters) {
-              const input = inputs[0][0];
-              if (!input) return true;
+    if (videoChatWindow) {
+        videoChatWindow.focus();
+        
+        // Wait for the window to load
+        videoChatWindow.onload = function() {
+            // Add fullscreen request script to the new window
+            const script = videoChatWindow.document.createElement('script');
+            script.textContent = `
+                // Function to request fullscreen
+                function enterFullscreen() {
+                    const element = document.documentElement;
+                    if (element.requestFullscreen) {
+                        element.requestFullscreen();
+                    } else if (element.webkitRequestFullscreen) { // Safari
+                        element.webkitRequestFullscreen();
+                    } else if (element.msRequestFullscreen) { // IE11
+                        element.msRequestFullscreen();
+                    }
+                }
 
-              // Add incoming samples to buffer
-              for (let i = 0; i < input.length; i++) {
-                  this.buffer[this.bufferedSamples] = input[i];
-                  this.bufferedSamples++;
+                // Add click listener to enter fullscreen on first interaction
+                document.addEventListener('click', function fullscreenHandler() {
+                    enterFullscreen();
+                    // Remove the listener after first click
+                    document.removeEventListener('click', fullscreenHandler);
+                }, { once: true });
 
-                  // When buffer is full, send it to main thread
-                  if (this.bufferedSamples >= this.bufferSize) {
-                      const int16Data = new Int16Array(this.bufferSize);
-                      for (let j = 0; j < this.bufferSize; j++) {
-                          int16Data[j] = Math.max(-32768, Math.min(32767, this.buffer[j] * 32768));
-                      }
-                      this.port.postMessage(int16Data.buffer, [int16Data.buffer]);
-                      
-                      // Reset buffer
-                      this.buffer = new Float32Array(this.bufferSize);
-                      this.bufferedSamples = 0;
-                  }
-              }
-              return true;
-          }
-      }
-      registerProcessor('audio-processor', AudioProcessor);
-  `;
+                // Add visible instructions
+                const instructions = document.createElement('div');
+                instructions.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999;';
+                instructions.textContent = 'Click anywhere to enter fullscreen mode';
+                document.body.appendChild(instructions);
 
-        let websocket;
-        let audioContext;
-        let workletNode;
-        const outputDiv = document.getElementById("output");
-        const startBtn = document.getElementById("startBtn");
-        const stopBtn = document.getElementById("stopBtn");
-        const languageSelect = document.getElementById("language");
-
-        async function initAudioWorklet() {
-          const blob = new Blob([workletCode], {
-            type: "application/javascript",
-          });
-          const workletUrl = URL.createObjectURL(blob);
-          await audioContext.audioWorklet.addModule(workletUrl);
-          URL.revokeObjectURL(workletUrl);
-        }
-
-        startBtn.onclick = async () => {
-          try {
-            // Connect to WebSocket server
-            websocket = new WebSocket("ws://localhost:8765");
-
-            websocket.onopen = () => {
-              websocket.send(
-                JSON.stringify({
-                  language: languageSelect.value,
-                })
-              );
-            };
-
-            websocket.onmessage = (event) => {
-              const data = JSON.parse(event.data);
-              if (data.type === "final") {
-                // Only send to peers, don't display locally
-                const transcriptionData = {
-                  text: data.text,
-                  sender: socket.id,
-                  type: "transcription",
-                };
-
-                // Emit transcription to peers
-                socket.emit("transcription", transcriptionData);
-              }
-            };
-
-            // Get audio stream
-            const stream = await navigator.mediaDevices.getUserMedia({
-              audio: true,
-            });
-
-            // Initialize audio context and worklet
-            audioContext = new AudioContext({
-              sampleRate: 8000, // Match Vosk's expected sample rate
-              latencyHint: "interactive",
-            });
-
-            await initAudioWorklet();
-
-            const source = audioContext.createMediaStreamSource(stream);
-            workletNode = new AudioWorkletNode(audioContext, "audio-processor");
-
-            workletNode.port.onmessage = (e) => {
-              if (websocket.readyState === WebSocket.OPEN) {
-                websocket.send(e.data);
-              }
-            };
-
-            source.connect(workletNode);
-            workletNode.connect(audioContext.destination);
-
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-          } catch (error) {
-            console.error("Error:", error);
-            alert("Error starting recording: " + error.message);
-          }
+                // Remove instructions after entering fullscreen
+                document.addEventListener('fullscreenchange', function() {
+                    if (document.fullscreenElement) {
+                        instructions.remove();
+                    }
+                });
+            `;
+            videoChatWindow.document.body.appendChild(script);
         };
+    }
+}
 
-        stopBtn.onclick = () => {
-          if (websocket) {
-            websocket.close();
-          }
-          if (workletNode) {
-            workletNode.disconnect();
-            workletNode = null;
-          }
-          if (audioContext) {
-            audioContext.close();
-            audioContext = null;
-          }
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
-        };
-      </script>
-    </footer>
+
+    </script>
   </body>
 </html>
