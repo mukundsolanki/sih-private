@@ -1,0 +1,363 @@
+/* Reset some default styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212; /* Dark background for body */
+  color: #ffffff; /* Light text color */
+}
+
+/* Left Panel Styles */
+.left-panel {
+  width: 50%;
+  overflow-y: auto;
+  border-right: 1px solid #333333;
+  padding: 20px;
+  background-color: #1e1e1e; /* Darker left panel */
+  position: relative;
+}
+
+.left-panel-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ffffff;
+  border-bottom: 2px solid #bb86fc;
+  padding-bottom: 10px;
+}
+
+.user-list {
+  overflow-y: auto;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  background-color: #2c2c2c;
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  user-select: none; /* Prevent text selection on long press */
+  cursor: pointer;
+}
+
+.user-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+.user-item.selected {
+  background-color: #bb86fc; /* Highlight color for selected items */
+  border-color: #bb86fc;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info .name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #03dac6;
+  margin-bottom: 5px;
+}
+
+.user-info .ip {
+  font-size: 14px;
+  color: #bbbbbb;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #03dac6;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+/* Action Buttons Styles */
+.action-buttons {
+  display: none; /* Hidden by default */
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.action-button {
+  flex: 1;
+  padding: 12px 0;
+  background-color: #bb86fc;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.action-button.cancel {
+  background-color: #cf6679;
+}
+
+.action-button:hover {
+  opacity: 0.9;
+}
+
+/* Right Panel Styles */
+.right-panel {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #1e1e1e;
+}
+
+.right-panel-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ffffff;
+  border-bottom: 2px solid #03dac6;
+  padding-bottom: 10px;
+}
+
+.logs {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  background-color: #2c2c2c;
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.log-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+.log-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-info .name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #03dac6;
+  margin-bottom: 5px;
+}
+
+.log-info .ip {
+  font-size: 14px;
+  color: #bbbbbb;
+  margin-bottom: 5px;
+}
+
+.log-info .time {
+  font-size: 12px;
+  color: #777777;
+}
+
+.log-status {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  gap: 10px;
+}
+
+.status-picked {
+  color: #03dac6;
+}
+
+.status-busy {
+  color: #ffb74d;
+}
+
+.status-rejected {
+  color: #cf6679;
+}
+
+.settings-button {
+  align-self: flex-end;
+  padding: 12px 25px;
+  background-color: #bb86fc;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.settings-button:hover {
+  opacity: 0.9;
+}
+
+/* Modal Styles - Dark Mode */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s;
+}
+
+.modal-content {
+  background-color: #2c2c2c; /* Dark background */
+  color: #ffffff; /* Light text */
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideDown 0.5s;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #bbbbbb; /* Light gray */
+  cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+  color: #ffffff;
+}
+
+.call-status {
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Spinner Styles - Dark Mode */
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #03dac6;
+  animation: spin 1s linear infinite;
+}
+
+/* Buttons Container */
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn.pickup {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+.btn.pickup:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.btn.reject {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.btn.reject:hover {
+  background-color: #da190b;
+  transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Scrollbar Styling (Optional) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}

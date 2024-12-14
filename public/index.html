@@ -72,60 +72,60 @@
       //     }
       // }
 
-    //   function launchVideoChat() {
-    //     // Open the video chat in a new window with fullscreen
-    //     const videoChatWindow = window.open(
-    //       "video_room.html", // Your video chat page
-    //       "VideoChat",
-    //       "fullscreen=yes,scrollbars=yes"
-    //     );
+      //   function launchVideoChat() {
+      //     // Open the video chat in a new window with fullscreen
+      //     const videoChatWindow = window.open(
+      //       "video_room.html", // Your video chat page
+      //       "VideoChat",
+      //       "fullscreen=yes,scrollbars=yes"
+      //     );
 
-    //     // Request fullscreen mode after window opens
-    //     if (videoChatWindow) {
-    //       videoChatWindow.focus();
-    //       // Add a small delay to ensure the window content is loaded
-    //       setTimeout(() => {
-    //         try {
-    //           // Try different fullscreen methods for browser compatibility
-    //           if (videoChatWindow.document.documentElement.requestFullscreen) {
-    //             videoChatWindow.document.documentElement.requestFullscreen();
-    //           } else if (
-    //             videoChatWindow.document.documentElement.mozRequestFullScreen
-    //           ) {
-    //             videoChatWindow.document.documentElement.mozRequestFullScreen();
-    //           } else if (
-    //             videoChatWindow.document.documentElement.webkitRequestFullscreen
-    //           ) {
-    //             videoChatWindow.document.documentElement.webkitRequestFullscreen();
-    //           } else if (
-    //             videoChatWindow.document.documentElement.msRequestFullscreen
-    //           ) {
-    //             videoChatWindow.document.documentElement.msRequestFullscreen();
-    //           }
-    //         } catch (e) {
-    //           console.log("Fullscreen request failed:", e);
-    //         }
-    //       }, 100);
-    //     }
-    //   }
-    
-    function launchVideoChat() {
-    // Open the video chat in a new window with maximum dimensions
-    const width = screen.width;
-    const height = screen.height;
-    const videoChatWindow = window.open(
-        'video-chat.html',
-        'VideoChat',
-        `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
-    );
+      //     // Request fullscreen mode after window opens
+      //     if (videoChatWindow) {
+      //       videoChatWindow.focus();
+      //       // Add a small delay to ensure the window content is loaded
+      //       setTimeout(() => {
+      //         try {
+      //           // Try different fullscreen methods for browser compatibility
+      //           if (videoChatWindow.document.documentElement.requestFullscreen) {
+      //             videoChatWindow.document.documentElement.requestFullscreen();
+      //           } else if (
+      //             videoChatWindow.document.documentElement.mozRequestFullScreen
+      //           ) {
+      //             videoChatWindow.document.documentElement.mozRequestFullScreen();
+      //           } else if (
+      //             videoChatWindow.document.documentElement.webkitRequestFullscreen
+      //           ) {
+      //             videoChatWindow.document.documentElement.webkitRequestFullscreen();
+      //           } else if (
+      //             videoChatWindow.document.documentElement.msRequestFullscreen
+      //           ) {
+      //             videoChatWindow.document.documentElement.msRequestFullscreen();
+      //           }
+      //         } catch (e) {
+      //           console.log("Fullscreen request failed:", e);
+      //         }
+      //       }, 100);
+      //     }
+      //   }
 
-    if (videoChatWindow) {
-        videoChatWindow.focus();
-        
-        // Wait for the window to load
-        videoChatWindow.onload = function() {
+      function launchVideoChat() {
+        // Open the video chat in a new window with maximum dimensions
+        const width = screen.width;
+        const height = screen.height;
+        const videoChatWindow = window.open(
+          "video-chat.html",
+          "VideoChat",
+          `width=${width},height=${height},left=0,top=0,resizable=yes,scrollbars=yes`
+        );
+
+        if (videoChatWindow) {
+          videoChatWindow.focus();
+
+          // Wait for the window to load
+          videoChatWindow.onload = function () {
             // Add fullscreen request script to the new window
-            const script = videoChatWindow.document.createElement('script');
+            const script = videoChatWindow.document.createElement("script");
             script.textContent = `
                 // Function to request fullscreen
                 function enterFullscreen() {
@@ -160,11 +160,9 @@
                 });
             `;
             videoChatWindow.document.body.appendChild(script);
-        };
-    }
-}
-
-
+          };
+        }
+      }
     </script>
   </body>
 </html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Intercom UI</title>
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Left Panel: Intercoms -->
+    <div class="left-panel">
+      <div class="left-panel-header">Intercoms</div>
+      <div class="user-list" id="userList">
+        <!-- Online devices will be rendered here dynamically -->
+      </div>
+      <!-- Action Buttons -->
+      <div class="action-buttons" id="actionButtons">
+        <button class="action-button call" id="callButton">Call</button>
+        <button class="action-button cancel" id="cancelButton">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Right Panel: Call Logs -->
+    <div class="right-panel">
+      <div class="right-panel-header">Call Logs</div>
+      <div class="logs" id="logs">
+        <!-- Call logs will be rendered here dynamically -->
+      </div>
+      <button class="settings-button">Settings</button>
+    </div>
+
+    <!-- Call Status Modal -->
+    <div id="callModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <div class="call-status" id="callStatus">Incoming Call...</div>
+        <div class="modal-buttons">
+          <button id="pickupButton" class="btn pickup">Pickup</button>
+          <button id="rejectButton" class="btn reject">Reject</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Include Socket.io client without Integrity attribute -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <!-- Link to External JS -->
+    <script src="script.js"></script>
+  </body>
+</html>
