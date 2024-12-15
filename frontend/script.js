@@ -66,6 +66,7 @@ pickupButton.addEventListener('click', () => {
     socket.emit('callResponse', { ip: extractIpFromStatus(), response: 'accepted' });
     // Implement additional pickup call logic here
     hideCallModal();
+    launchVideoChat()
 });
 
 // Event listener for Reject button
